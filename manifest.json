@@ -1,11 +1,11 @@
  {
  "manifest_version": 2,
 
- "name": "Art Up Your Tab",
- "version": "1.2.1",
- "short_name": "Art Up Your Tab",
- "description": "Art Up Your Tab with carefully selected artworks from the rich collection of Europeana.",
- "homepage_url": "http://art-tab.eu",
+ "name": "Art Up Your Tab – Tracking Free",
+ "version": "1.2.2",
+ "short_name": "Art Up Your Tab – Tracking Free",
+ "description": "Art Up Your Tab – Tracking Free with carefully selected artworks from the rich collection of Europeana, without Google Analytics.",
+ "homepage_url": "https://github.com/burnoutberni/artupyourtab",
  "icons": {
     "128": "icon/icon128.png",
     "16": "icon/icon16.png",

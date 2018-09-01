@@ -8,7 +8,7 @@ Firefox add-on
 // HOOKS //
 ///////////
 
-// Load content on install 
+// Load content on install
 browser.runtime.onInstalled.addListener(function() {
   getStarted.updateData();
 });
@@ -18,12 +18,6 @@ browser.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
   if (changeinfo.status == "complete")
     getStarted.updateData();
 });
-
-  // share tracking analytics
-  var txt_shareFB =  "Facebook share in Firefox Extension";
-  var txt_shareTW = "Twitter share in Firefox Extension";
-  var txt_download = "Image download in Firefox Extension";
-  var txt_artopen = "Tab opened in Firefox Extension";
 
 /////////////////
 // GET STARTED //
@@ -37,8 +31,6 @@ var getStarted = (function(){
     debug: false,
     refresh: 60 * 60 * 4 // every 4 hours we check if the json has been updated on remote
   };
-  const GA_TRACKING_ID = "UA-1301359-39";
-  const GA_CLIENT_ID = generateGaClientId();
 
   // Get the current state
   var state = {
@@ -47,19 +39,6 @@ var getStarted = (function(){
     data: JSON.parse(localStorage.data || '[]'),
     about: JSON.parse(localStorage.about || '[]')
   };
-
-  // generates a client ID for Google Analytics
-  function generateGaClientId() {
-    var ts = Math.round(+new Date() / 1000.0);
-    var rand;
-    try{  
-      var uu32 = new Uint32Array(1);
-      rand = crypto.getRandomValues(uu32)[0];
-    } catch(e) {
-      rand = Math.round(Math.random() * 2147483647);
-    }
-    return [rand, ts].join('.');
-  }
 
   // get current timestamp
   function Now() {
@@ -213,12 +192,6 @@ var getStarted = (function(){
           return item;
         });
         writeData();
-
-        // send pageview and ArtOpen event to Analytics
-        if(!settings.debug) {
-          getStarted.GAsendPageView(nextItem.image,nextItem.title);
-          getStarted.reportGA(txt_artopen, nextItem.title);
-        }
       });
     },
 
@@ -228,38 +201,10 @@ var getStarted = (function(){
       resolve(state.about);
       });
     },
-
-    // report the events to Google Analytics
-    reportGA: function(category,action,label) {
-      try {
-        var request = new XMLHttpRequest();
-        var message =
-          "v=1&tid=" + GA_TRACKING_ID + "&cid= " + GA_CLIENT_ID + "&aip=1" +
-          "&ds=add-on&t=event&ec="+category+"&ea="+action+"&el="+label;
-
-        request.open("POST", "https://www.google-analytics.com/collect", true);
-        request.send(message);
-      } catch (e) {
-        console.log("Error sending event to Google Analytics.\n" + e);
-      }
-    },
-    // send pageview to Google Analytics 
-    GAsendPageView: function(image,title) {
-      try {
-        var request = new XMLHttpRequest();
-        var message =
-          "v=1&t=pageview&aip=1&ds=add-on&tid="+GA_TRACKING_ID+"&cid= "+GA_CLIENT_ID+"&dp="+title+"&dt="+image;
-
-        request.open("POST", "https://www.google-analytics.com/collect", true);
-        request.send(message);
-      } catch (e) {
-        console.log("Error sending pageview to Google Analytics.\n" + e);
-      }
-    },
   };
 })();
 
-// FisherYates randomize 
+// FisherYates randomize
 function fisherYates(array) {
   var count = array.length,
       randomnumber,
@@ -280,7 +225,7 @@ function fisherYates(array) {
 getStarted.renderItem().then(function(item){
   // selectors to insert the data
   var backgroundEl = document.getElementById('image-background');
-  
+
   var infoBar = document.getElementById('info-bar');
   var imageThumb = document.getElementById('image-thumb');
   var shareDownload = document.getElementById('share-download');
@@ -363,7 +308,7 @@ getStarted.renderItem().then(function(item){
       }
     }
   }
-  
+
   // render about box data
   getStarted.renderAbout().then(function(about){
     var aboutTitle = document.getElementById('about-title');
@@ -406,7 +351,7 @@ var bgImage = document.getElementById('image-background');
 function toggleInfoBox(el) {
   if (!el.classList.contains("show")) {
     openItem(modalBox);
-    openItem(infoBox);   
+    openItem(infoBox);
   } else {
     closeItem(modalBox);
     closeItem(aboutBox);
@@ -415,13 +360,13 @@ function toggleInfoBox(el) {
 function toggleShareBox(close) {
   if (infoBarShare.classList.contains("open")) {
     infoBarShare.classList.remove('open');
-    infoBarShareBox.classList.remove('show');   
+    infoBarShareBox.classList.remove('show');
   } else if (!close) {
     infoBarShare.classList.add('open');
     infoBarShareBox.classList.add('show');
   }
 }
-      
+
 
 function closeItem(el) {
     el.classList.remove("show");
@@ -478,31 +423,4 @@ window.onload = function() {
 
   // toggle share infobar
   infoBarShare.onclick=function(){toggleShareBox();};
-
-  // share tracking analytics
-  var share_value = document.querySelector('h1.item-title');
-  // FB share event
-  var FB1 = document.getElementById('info-share-facebook');
-  var FB2 = document.getElementById('share-facebook');
-  FB1.addEventListener('click', function(e) {
-    getStarted.reportGA(txt_shareFB, share_value.textContent);
-  });
-  FB2.addEventListener('click', function(e) {
-    getStarted.reportGA(txt_shareFB, share_value.textContent);
-  });
-  // Twitter share event
-  var TW1 = document.getElementById('info-share-twitter');
-  var TW2 = document.getElementById('share-twitter');
-  TW1.addEventListener('click', function(e) {
-   getStarted.reportGA(txt_shareTW, share_value.textContent);
-  });
-  TW2.addEventListener('click', function(e) {
-    getStarted.reportGA(txt_shareTW, share_value.textContent);
-  });
-  // Download event
-  var DL = document.getElementById('share-download');
-  DL.addEventListener('click', function(e) {
-    getStarted.reportGA(txt_download, share_value.textContent);
-  });
 };
-
